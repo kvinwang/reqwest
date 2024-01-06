@@ -13,13 +13,19 @@ use crate::IntoUrl;
 extern "C" {
     #[wasm_bindgen(js_name = fetch)]
     fn fetch_with_request(input: &web_sys::Request) -> Promise;
+
+    #[wasm_bindgen(js_name = phatjsFetch)]
+    fn phatjs_fetch_with_request(input: &web_sys::Request) -> Promise;
 }
 
 fn js_fetch(req: &web_sys::Request) -> Promise {
     use wasm_bindgen::{JsCast, JsValue};
     let global = js_sys::global();
 
-    if let Ok(true) = js_sys::Reflect::has(&global, &JsValue::from_str("ServiceWorkerGlobalScope"))
+    if let Ok(true) = js_sys::Reflect::has(&global, &JsValue::from_str("phatjsFetch")) {
+        phatjs_fetch_with_request(req)
+    } else if let Ok(true) =
+        js_sys::Reflect::has(&global, &JsValue::from_str("ServiceWorkerGlobalScope"))
     {
         global
             .unchecked_into::<web_sys::ServiceWorkerGlobalScope>()
